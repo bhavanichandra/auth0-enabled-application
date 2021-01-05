@@ -2,12 +2,14 @@
 	padding: 0;
 	margin: 0 auto;
 	width: 50%;
+	min-width: 820px;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	border: 1px solid #ccc;
 	box-shadow: 2px 2px 2px #ccc;
+	
 }
 
 .Explorer form {
@@ -54,6 +56,7 @@
 
 .Explorer .Input input {
 	width: 350px;
+	max-width: 350px;
 	border: 1px solid #ffa33a;
 	border-radius: 2px;
 }
@@ -73,4 +76,20 @@
 	padding: 10px;
 	margin: 25px auto;
 	width: 50%;
+	max-width: 950px;
+	min-width: 800px;
+}
+
+@media(max-width: 850px) {
+
+	.Explorer {
+		min-width: 500px;
+	}
+
+	.Explorer .Input input {
+		max-width: 200px;
+	}
+	.Response {
+		min-width: 500px;
+	}
 }
