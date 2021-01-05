@@ -71,49 +71,67 @@ const Explorer = (props) => {
 
 		setState({ data: response.data });
 		setIsLoading(false);
-		event.target.clear();
+		event.target.reset();
 	};
 
 	return (
-		<div className={classes.Explorer}>
-			<h4>Explorer for Auth0 Enabled APIs</h4>
-			<form onSubmit={formSubmitHandler}>
-				<label htmlFor='url'>URL</label>
-				<input id='url' name='url' type='text' placeholder='Enter URL' />
+		<Fragment>
+			<div className={classes.Explorer}>
+				<h4>Explorer for Auth0 Enabled APIs</h4>
+				<form onSubmit={formSubmitHandler}>
+					<div className={classes.Input}>
+						<label htmlFor='url'>URL</label>
+						<input id='url' name='url' type='text' placeholder='Enter URL' />
+					</div>
 
-				<label htmlFor='method'>Http Method</label>
-				<select
-					id='method'
-					name='method'
-					value={selectValue}
-					onChange={selectValueChangeHandler}>
-					<option value='GET'>GET</option>
-					<option value='POST'>POST</option>
-					<option value='PUT'>PUT</option>
-					<option value='PATCH'>PATCH</option>
-					<option value='DELETE'>DELETE</option>
-				</select>
+					<div className={classes.Input}>
+						<label htmlFor='method'>Method</label>
+						<select
+							id='method'
+							name='method'
+							value={selectValue}
+							onChange={selectValueChangeHandler}>
+							<option value='GET'>GET</option>
+							<option value='POST'>POST</option>
+							<option value='PUT'>PUT</option>
+							<option value='PATCH'>PATCH</option>
+							<option value='DELETE'>DELETE</option>
+						</select>
+					</div>
 
-				{requestBody}
-				<button type='submit'>Send Request</button>
-			</form>
-			{isLoading ? (
-				<Spinner />
-			) : (
-				<div className={classes.Response}>
-					{state.data === null ? (
-						'Click Send Request to see Response here'
+					{requestBody ? (
+						<>
+							<div className={classes.Input}>{requestBody}</div>
+							<div className={classes.Input}>
+								<button type='submit'>Send Request</button>
+							</div>
+						</>
 					) : (
-						<ReactJson
-							src={state.data}
-							theme='rjv-default'
-							indentWidth='10'
-							style={{ padding: '10px', textAlign: 'left' }}
-						/>
+						<div className={classes.Input}>
+							<button type='submit'>Send Request</button>
+						</div>
 					)}
-				</div>
-			)}
-		</div>
+				</form>
+			</div>
+			<div>
+				{isLoading ? (
+					<Spinner />
+				) : (
+					<div className={classes.Response}>
+						{state.data === null ? (
+							'Click Send Request to see Response here'
+						) : (
+							<ReactJson
+								src={state.data}
+								theme='rjv-default'
+								indentWidth='10'
+								style={{ padding: '10px', textAlign: 'left' }}
+							/>
+						)}
+					</div>
+				)}
+			</div>
+		</Fragment>
 	);
 };
 

@@ -1,47 +1,76 @@
 .Explorer {
 	padding: 0;
-	margin: auto;
-	width: 850px;
+	margin: 0 auto;
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	border: 1px solid #ccc;
 	box-shadow: 2px 2px 2px #ccc;
 }
 
 .Explorer form {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	display: grid;
+	grid-template-rows: 0.5fr 0.5fr 8fr 1.5fr;
+	row-gap: 15px;
+	margin-bottom: 25px;
 }
 
-.Explorer input,
-.Explorer select {
-	width: 500px;
-	margin: 10px 0;
-	align-self: center;
+.Explorer .Input {
+	display: grid;
+	grid-template-columns: repeat(2, 50%);
+	
 }
 
-.Explorer input[type='textarea'] {
-	height: 150px;
+.Explorer .Input label {
+	margin: 0 15px;
 }
 
-.Explorer button {
-	border: 1px solid black;
-	width: 250px;
+.Explorer .Input label[for='body'] {
+	position: relative;
+	top: 45%;
+}
+
+.Explorer .Input button {
+	grid-column: -2 / -1;
 	padding: 5px;
-	margin-top: 5px;
-	align-self: center;
-	background-color: #fff;
+	margin: auto;
+	width: 150px;
+	outline: none;
+	border: 1px solid;
+	border-radius: 5px;
+	background-color: #f5ce85;
+	border: 1px solid #f5ce85;
 	cursor: pointer;
 }
-
-.Explorer button:hover,
-.Explorer button:active {
-	background-color: sandybrown;
+.Explorer .Input button:hover,
+.Explorer .Input button:active {
 	color: white;
+	width: 150px;
+	background-color: #ee5f33;
+	border-bottom: 2px solid #ee5f33;
+}
+
+.Explorer .Input input {
+	width: 350px;
+	border: 1px solid #ffa33a;
+	border-radius: 2px;
+}
+.Explorer .Input input[id='body'] {
+	text-align: left;
+	border: 1px solid #ffa33a;
+	border-radius: 2px;
+}
+
+.Explorer .Input select {
+	border: 1px solid #ffa33a;
+	border-radius: 2px;
 }
 
 .Response {
-    margin: 15px;
-    padding: 15px;
-    
-    border: 1px solid black;
+	border: 2px solid black;
+	padding: 10px;
+	margin: 25px auto;
+	width: 50%;
 }
