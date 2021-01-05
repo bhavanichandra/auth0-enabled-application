@@ -1,0 +1,88 @@
+#%RAML 1.0
+title: Auth0 Test API
+version: v1
+
+traits:
+  jwt:
+    headers:
+      authorization:
+        description: Bearer 
+        type: string
+    responses:
+      400:
+        description: Token was not provided.
+      401:
+        description: Bad or expired token. To fix, you should re-authenticate the user.
+      403:
+        description: The client id validation failed.
+      503:
+        description: Error communicating with JWKS server.
+
+/contact:
+  is: [jwt]
+  get: 
+    description: gets Contacts  
+    responses: 
+      200:
+        body: 
+          application/json: 
+            example: [{"id": "01", "name": "Ian"},{"id": "02","name": "John"}]
+      403:
+        body: 
+          application/json: 
+            example: {"message": "User doesn't have read permissions!"}
+  post: 
+    description: gets Contacts
+    body: 
+      application/json: 
+        example: {"name": "Ian"}
+    responses: 
+      200:
+        body: 
+          application/json: 
+            example: {"id": "01","name": "Ian"}
+      403:
+        body: 
+          application/json: 
+            example: {"message": "User doesn't have write permissions!"}
+  /{id}:
+    is: [jwt]
+    put: 
+      description: gets Contacts
+      body: 
+        application/json: 
+          example: {"name": "Ian"}
+      responses: 
+        200:
+          body: 
+            application/json: 
+              example: {"id": "01","name": "John"}
+        403:
+          body: 
+            application/json: 
+              example: {"message": "User doesn't have update permissions!"}
+    patch: 
+      description: gets Contacts
+      body: 
+        application/json: 
+          example: {"name": "Ian"}
+      responses: 
+        200:
+          body: 
+            application/json: 
+              example: {"id": "01","name": "John"}
+        403:
+          body: 
+            application/json: 
+              example: {"message": "User doesn't have update permissions!"} 
+    delete: 
+      description: delete
+      responses: 
+        200:
+          body: 
+            application/json: 
+              example: {"id": "01","name": "John"}
+        403:
+          body: 
+            application/json: 
+              example: {"message": "User doesn't have delete permissions!"}

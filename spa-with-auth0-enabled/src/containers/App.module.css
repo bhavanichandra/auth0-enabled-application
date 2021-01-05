@@ -1,0 +1,58 @@
+.App {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.App nav {
+	/* background-color: #ffa366; */
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+.App ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.App li {
+	display: inline-block;
+	margin: 20px;
+}
+.App a {
+	text-decoration: none;
+	color: black;
+}
+
+.App a:hover,
+.App a:active,
+.App a.active {
+	/* color: #fff; */
+	border-bottom: 2px solid #ee5f33;
+}
+
+.App main {
+	margin: auto;
+	position: relative;
+	width: 100%;
+}
+
+.App .Button {
+	width: 85px;
+	padding: 5px;
+	margin-top: 5px;
+	background-color: #f5ce85;
+	border: 1px solid #f5ce85;
+	border-radius: 10px;
+	display: inline-block;
+	box-sizing: border-box;
+	cursor: pointer;
+}
+
+.App .Button:hover,
+.App .Button:active {
+	color: white;
+	background-color: #ee5f33;
+	border-bottom: 2px solid #ee5f33;
+}

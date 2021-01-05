@@ -1,0 +1,19 @@
+.User {
+	display: grid;
+    grid-template-areas: 'key value';
+    border: 1px solid black;
+}
+
+.User .Key {
+    display: block;
+	text-transform: capitalize;
+    font-weight: bold;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+.User .Value {
+    display: block;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+}

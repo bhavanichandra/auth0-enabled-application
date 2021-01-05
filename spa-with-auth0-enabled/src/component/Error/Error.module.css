@@ -1,0 +1,28 @@
+.Error {
+	width: 80%;
+	height: 80%;
+    padding: 10px;
+    margin: auto;
+	position: relative;
+	z-index: 5;
+	border: 1px solid #ccc;
+	box-shadow: 2px 2px #ccc;
+}
+
+.Error button {
+	padding: 5px;
+	background-color: #c2e9f3;
+	border: 1px solid #2990f0;
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.Error button:hover,
+.Error button:active {
+	background-color: #f39c1a;
+	color: white;
+}
+
+.Close {
+	display: none;
+}

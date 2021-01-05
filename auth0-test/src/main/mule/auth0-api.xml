@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:module-jwt-validator="http://www.mulesoft.org/schema/mule/module-jwt-validator" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/module-jwt-validator http://www.mulesoft.org/schema/mule/module-jwt-validator/current/mule-module-jwt-validator.xsd">
+    <http:listener-config name="auth0-api-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+		<http:listener-interceptors >
+			<http:cors-interceptor >
+				<http:origins >
+					<http:public-resource />
+				</http:origins>
+			</http:cors-interceptor>
+		</http:listener-interceptors>
+    </http:listener-config>
+    <apikit:config name="auth0-api-config" api="auth0-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <api-gateway:autodiscovery apiId="16538538" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="af5ddda5-b6e8-4537-b0ff-8dd23a963a4b" flowRef="auth0-api-main" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="5ee1620a-48cb-47c7-9a38-c7d98cc17f10" />
+	<flow name="auth0-api-main">
+        <http:listener config-ref="auth0-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <logger level="INFO" doc:name="Logger" doc:id="dde41179-7855-4db9-8e58-1ec734222a0b" message='ucmnetId -&gt; #[(authentication.properties.claims.sub as String splitBy "|")[2]] Path -&gt; #[attributes.rawRequestPath] Method -&gt; #[attributes.method]' />
+		<apikit:router config-ref="auth0-api-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">400</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "Method: " ++ attributes.method  ++  "not allowed for path: " ++ attributes.rawRequestPath
+}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">406</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">415</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+                <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">501</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\contact\(id):application\json:auth0-api-config">
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+				<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<os:retrieve doc:name="Retrieve" doc:id="e75ee276-3d86-4a18-8d22-13ece4451325" key="#[vars.id]" objectStore="Object_store" >
+			<os:default-value ><![CDATA[#[{
+	
+}]]]></os:default-value>
+		</os:retrieve>
+		<choice doc:name="Choice" doc:id="b46a0e2b-9e68-4237-8493-9ab5627c15a2" >
+			<when expression="#[!isEmpty(payload)]" >
+				<ee:transform doc:name="Transform Message" doc:id="2cec0f1a-d056-4ac4-a44b-9ca6a4a36523" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: payload.id,
+	name: vars.request.name
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Store" doc:id="d6aabccb-06f6-46e2-8d15-539ff0e34c21" key="#[vars.id]" objectStore="Object_store" />
+				<set-variable value="200" doc:name="Set_Variable httpStatus" doc:id="a43d918c-8bb4-4e7f-8390-745189783f7c" variableName="httpStatus" />
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="e6e07891-1343-4661-aabc-27aafdfc2f43" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "User Not Found! Cannot do a patch"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[404]" doc:name="Set Variable httpStatus" doc:id="7469d66e-e57d-4f33-be07-0b836333d104" variableName="httpStatus" />
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="delete:\contact\(id):auth0-api-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id">attributes.uriParams.'id'</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+        <os:remove doc:name="Remove" doc:id="3c0635a1-32a1-4086-9e3d-c3f383d736e4" key="#[vars.id]" objectStore="Object_store"/>
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'Removed User: ' ++ vars.id
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<set-variable value="200" doc:name="Set Variable httpStatus" doc:id="e4073a0c-98cc-4e0b-8bfe-4eccb4625495" variableName="httpStatus"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a1c2946f-cb08-493f-ad14-7a03b97f946e" type="OS:INVALID_KEY, OS:KEY_NOT_FOUND, OS:STORE_NOT_AVAILABLE">
+				<ee:transform doc:name="Transform Message" doc:id="7c7db9d5-93bc-48dc-9644-e8e0ab59d289" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: 'UserId: ' ++ (vars.id default ' ') ++ ' is not found / available'
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="404" doc:name="Set Variable" doc:id="68573f97-2121-407a-b49d-82795b939c20" variableName="httpStatus"/>
+			</on-error-continue>
+		</error-handler>
+    </flow>
+    <flow name="patch:\contact\(id):application\json:auth0-api-config">
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core">
+            <ee:variables>
+                <ee:set-variable variableName="id"><![CDATA[attributes.uriParams.'id']]></ee:set-variable>
+				<ee:set-variable variableName="request" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+		<os:retrieve doc:name="Retrieve" doc:id="94c1d7d5-99f8-4eb5-8075-f60de7608401" key="#[vars.id]" objectStore="Object_store">
+			<os:default-value><![CDATA[#[{
+	
+}]]]></os:default-value>
+		</os:retrieve>
+		<choice doc:name="Choice" doc:id="ef87e7bd-d0e7-4551-9483-424ab86b62f3">
+			<when expression="#[!isEmpty(payload)]">
+				<ee:transform doc:name="Transform Message" doc:id="5c0314d9-c640-41ef-85b2-2867838604a0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: payload.id,
+	name: vars.request.name
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<os:store doc:name="Store" doc:id="08e9bf70-132d-4305-b23a-df845766eac6" key="#[vars.id]" objectStore="Object_store" />
+				<set-variable value="200" doc:name="Set Variable httpStatus" doc:id="3a6c06f5-7a01-4033-a3cf-23c6f80f5df6" variableName="httpStatus" />
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message" doc:id="9fdd60ff-6556-4a5c-9c87-de51ee889dee">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message: "User Not Found! Cannot do a patch"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[404]" doc:name="Set Variable httpStatus" doc:id="955230ce-d9e3-4f41-83ea-00e4f4020417" variableName="httpStatus" />
+			</otherwise>
+		</choice>
+    </flow>
+    <flow name="get:\contact:auth0-api-config">
+        <os:retrieve-all doc:name="Retrieve all" doc:id="f38f7c2a-1abe-4f97-8dbc-d67334646762" objectStore="Object_store" />
+		<ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload pluck (value,key) -> (value)]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+    </flow>
+    <flow name="post:\contact:application\json:auth0-api-config">
+        <ee:transform xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	id: uuid(),
+	name: payload.name
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+		<os:store doc:name="Store Users" doc:id="7c2d3123-85dd-4b99-9cfe-54f5f58e2852" key="#[payload.id]" objectStore="Object_store"/>
+		<set-variable value="201" doc:name="Set Variable" doc:id="b37d3695-ffdd-4773-b431-fd0fcf571b4f" variableName="httpStatus"/>
+    </flow>
+</mule>

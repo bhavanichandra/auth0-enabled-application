@@ -1,0 +1,15 @@
+.Home {
+	border: 1px solid #ccc;
+	padding: 10px;
+	box-shadow: 2px 2px 1px #ccc;
+	border-radius: 10px;
+	max-width: 1024px;
+	margin: auto;
+}
+
+
+@media (min-width: 500px) {
+	.Home {
+		width: 60%;
+	}
+}

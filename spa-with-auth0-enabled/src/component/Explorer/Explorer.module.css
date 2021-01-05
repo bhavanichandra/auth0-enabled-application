@@ -1,0 +1,47 @@
+.Explorer {
+	padding: 0;
+	margin: auto;
+	width: 850px;
+	border: 1px solid #ccc;
+	box-shadow: 2px 2px 2px #ccc;
+}
+
+.Explorer form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.Explorer input,
+.Explorer select {
+	width: 500px;
+	margin: 10px 0;
+	align-self: center;
+}
+
+.Explorer input[type='textarea'] {
+	height: 150px;
+}
+
+.Explorer button {
+	border: 1px solid black;
+	width: 250px;
+	padding: 5px;
+	margin-top: 5px;
+	align-self: center;
+	background-color: #fff;
+	cursor: pointer;
+}
+
+.Explorer button:hover,
+.Explorer button:active {
+	background-color: sandybrown;
+	color: white;
+}
+
+.Response {
+    margin: 15px;
+    padding: 15px;
+    
+    border: 1px solid black;
+}
