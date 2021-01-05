@@ -27,7 +27,21 @@ http://www.mulesoft.org/schema/mule/module-jwt-validator http://www.mulesoft.org
                 <http:headers>#[vars.outboundHeaders default {}]</http:headers>
             </http:error-response>
         </http:listener>
-        <logger level="INFO" doc:name="Logger" doc:id="dde41179-7855-4db9-8e58-1ec734222a0b" message='ucmnetId -&gt; #[(authentication.properties.claims.sub as String splitBy "|")[2]] Path -&gt; #[attributes.rawRequestPath] Method -&gt; #[attributes.method]' />
+        <ee:transform doc:name="Transform Message" doc:id="70c2c873-e965-4928-bbd1-d530dbb9a7f0" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="authentication" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	ucmnetId: (authentication.properties.claims.sub as String splitBy "|")[2],
+	path:attributes.rawRequestPath,
+	method: attributes.method
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dde41179-7855-4db9-8e58-1ec734222a0b" message='Authentication Details -&gt; #[vars.authentication]' />
 		<apikit:router config-ref="auth0-api-config" />
         <error-handler>
             <on-error-propagate type="APIKIT:BAD_REQUEST">
