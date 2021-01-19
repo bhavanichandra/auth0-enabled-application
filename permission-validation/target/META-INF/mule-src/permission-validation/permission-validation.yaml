@@ -1,0 +1,29 @@
+id: permissions-validation
+name: permissions-validation
+description: Policy to validate permissions fetched via JWT Policy. [JWT VALIDATION POLICY IS REQUIRED]
+category: Custom
+type: custom
+resourceLevelSupported: true
+encryptionSupported: false
+standalone: true
+requiredCharacteristics: []
+providedCharacteristics: []
+configuration:
+  - propertyName: permissions
+    name: permissions
+    description: Expression of permissions from parsed JWT TOken [DON'T CHANGE].
+    type: string
+    defaultValue: "#[authentication.properties.claims.permissions]"
+    optional: false
+  - propertyName: method
+    name: method
+    description: Expression to get HTTP Method. [DON'T CHANGE]
+    type: string
+    defaultValue: "#[attributes.method]"
+    optional: false
+  - propertyName: requestPath
+    name: requestPath
+    description: Expression to get current request path accessed. [DON'T CHANGE]
+    type: string
+    defaultValue: "#[attributes.maskedRequestPath]"
+    optional: false

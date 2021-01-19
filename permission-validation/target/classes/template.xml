@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+      xmlns:http="http://www.mulesoft.org/schema/mule/http"
+      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+      xmlns:http-policy="http://www.mulesoft.org/schema/mule/http-policy"
+      xmlns:http-transform="http://www.mulesoft.org/schema/mule/http-policy-transform"
+      xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+              http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+
+              http://www.mulesoft.org/schema/mule/http-policy-transform http://www.mulesoft.org/schema/mule/http-policy-transform/current/mule-http-policy-transform.xsd
+              http://www.mulesoft.org/schema/mule/http-policy http://www.mulesoft.org/schema/mule/http-policy/current/mule-http-policy.xsd">
+
+    <http-policy:proxy name="{{{policyId}}}-permissions-validation-custom-policy">
+        <http-policy:source>
+            <set-variable variableName="permissions" value="{{{permissions}}}"/>
+            <set-variable variableName="method" value="{{{method}}}"/>
+            <set-variable variableName="requestPath" value="{{{requestPath}}}"/>
+
+            <set-variable value="#[%dw 2.0
+output application/json
+var permissionStr = vars.method match  {
+    case str: 'GET' -&gt; ('read:' ++ vars.requestPath replace  &quot;/&quot; with &quot;_&quot;)
+    else -&gt; ('write:' ++ vars.requestPath replace  &quot;/&quot; with &quot;_&quot;)
+}
+var permissions = vars.permissions map ($ replace &quot;:&quot; with &quot;:_&quot;)
+---
+permissions contains permissionStr]" doc:name="Set Variable isAccessible" variableName="isAccessible"/>
+            <choice doc:name="Choice">
+                <when expression="#[vars.isAccessible]">
+                    <http-policy:execute-next/>
+                </when>
+                <otherwise>
+                    <http-transform:set-response statusCode="401" reasonPhrase="Unauthorized">
+                        <http-transform:body>#[ output application/json ---  {status: 401,message: "Cannot access the resource"} ]
+                        </http-transform:body>
+                        <http-transform:headers>#[
+                            {
+                            'Content-Type': 'application/json'
+                            }
+                            ]
+                        </http-transform:headers>
+                    </http-transform:set-response>
+                </otherwise>
+            </choice>
+        </http-policy:source>
+    </http-policy:proxy>
+</mule>
