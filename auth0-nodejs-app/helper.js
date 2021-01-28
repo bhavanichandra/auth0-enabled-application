@@ -7,13 +7,8 @@ const management = new ManagementClient({
 	clientSecret: process.env.AUTH0_CLIENT_SECRET
 });
 
-const getRoles = async () => {
-	const roles = await management.getRoles();
-	return roles;
-};
-
 const getPermissionsForAllRoles = async () => {
-	const roles = await getRoles();
+	const roles = await management.getRoles();
 	const permissionMap = roles.map(async (role) => {
 		const permissions = await management.getPermissionsInRole({
 			id: role.id
@@ -27,41 +22,61 @@ const getPermissionsForAllRoles = async () => {
 	return response;
 };
 
-const rule = async () => {
-	const role = 'affiliate';
-	const otherRoles = ['student', 'affiliate'];
-	const roleExistsInOtherRoles =
-		otherRoles.find((each) => each === role) != null;
+const findAndAssignRolesToUser = async (userId, otherRoles) => {
 	const permissions = await getPermissionsForAllRoles();
-	const filteredPermissions = [];
-	if (roleExistsInOtherRoles) {
-		for (let r of otherRoles) {
-			const permission = permissions.flat().find((p) => {
-				return p.role.toLowerCase() === r.toLowerCase();
-			});
-			if (permission) {
-				filteredPermissions.push(permission);
-			}
-		}
-	} else {
-		const permission = permissions
-			.flat()
-			.find((p) => p.role.toLowerCase() === role.toLowerCase());
+	const result = [];
+	for (let r of otherRoles) {
+		const permission = permissions.flat().find((p) => {
+			return p.role.toLowerCase() === r.toLowerCase();
+		});
+		const response = {};
 		if (permission) {
-			filteredPermissions.push(permission);
-		}
-		for (let r of otherRoles) {
-			const otherPermission = permissions.flat().find((p) => {
-				return p.role.toLowerCase() === r.toLowerCase();
-			});
-			if (otherPermission) {
-				filteredPermissions.push(otherPermission);
+			try {
+				await management.assignRolestoUser(
+					{ id: userId },
+					{ roles: [permission.roleId] }
+				);
+				response.success = true;
+				response.message = `Role: ${r} is assigned to user: ${userId}`;
+			} catch (error) {
+				response.success = false;
+				response.message = error.message;
 			}
+		} else {
+			response.success = false;
+			response.message = `Role: ${r} doesn't exists in Auth0`;
 		}
+		result.push(response);
 	}
-	return filteredPermissions;
+	return result;
 };
 
-rule().then((pers) => {
+const rule = async (user, context) => {
+	const roles = context.authorization.roles;
+	const otherRoles = user.eduPersonAffiliation;
+	if (roles.length == 0) {
+		await findAndAssignRolesToUser(user.user_id, otherRoles);
+		return { user, context };
+	} else {
+		const newRoles = [];
+		for (let r of roles) {
+			const shibbolethRoles = otherRoles.find(
+				(role) => r.toLowerCase() === role.toLowerCase()
+			);
+			newRoles.push(shibbolethRoles);
+		}
+		if (newRoles.length > 0) {
+			await findAndAssignRolesToUser(user.user_id, newRoles);
+			return { user, context };
+		} else {
+			return { user, context };
+		}
+	}
+};
+
+const user = require('./user.json');
+const context = require('./context.json');
+
+rule(user, context).then((pers) => {
 	console.log(pers);
 });

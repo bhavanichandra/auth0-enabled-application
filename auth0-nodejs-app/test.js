@@ -1,19 +1,13 @@
-function rule(user, context, callback) {
+function t(user, context, callback) {
 	const ManagementClient = require('auth0@2.23.0').ManagementClient;
 	const management = new ManagementClient({
-		domain: 'dev-17rcu4-9.auth0.com',
-		clientId: 'OMURB1XuytvTzn5ac2OlZwzDArw75CX0',
-		clientSecret:
-			'BEdETWtLo3ddOeI6HGpcQRcLnSj_rPlic6wVHKDL2EpSQWykQA6T01V719y_uzaz'
+		domain: configuration.AUTH0_DOMAIN,
+		clientId: configuration.AUTH0_CLIENT_ID,
+		clientSecret: configuration.AUTH0_CLIENT_SECRET
 	});
 
-	const getRoles = async () => {
-		const roles = await management.getRoles();
-		return roles;
-	};
-
 	const getPermissionsForAllRoles = async () => {
-		const roles = await getRoles();
+		const roles = await management.getRoles();
 		const permissionMap = roles.map(async (role) => {
 			const permissions = await management.getPermissionsInRole({
 				id: role.id
@@ -27,36 +21,59 @@ function rule(user, context, callback) {
 		return response;
 	};
 
-	const auth0Rule = async (user, context) => {
+	const findAndAssignRolesToUser = async (userId, otherRoles) => {
+		const permissions = await getPermissionsForAllRoles();
+		const result = [];
+		for (let r of otherRoles) {
+			const permission = permissions.flat().find((p) => {
+				return p.role.toLowerCase() === r.toLowerCase();
+			});
+			const response = {};
+			if (permission) {
+				try {
+					await management.assignRolestoUser(
+						{ id: userId },
+						{ roles: [permission.roleId] }
+					);
+					response.success = true;
+					response.message = `Role: ${r} is assigned to user: ${userId}`;
+				} catch (error) {
+					response.success = false;
+					response.message = error.message;
+				}
+			} else {
+				response.success = false;
+				response.message = `Role: ${r} doesn't exists in Auth0`;
+			}
+			result.push(response);
+		}
+		return result;
+	};
+
+	const rule = async (user, context) => {
 		const roles = context.authorization.roles;
-		const userRole = user.Role;
+		const otherRoles = user.eduPersonAffiliation;
 		if (roles.length === 0) {
-			context.authorization.roles.push(userRole);
-			const permissions = await getPermissionsForAllRoles();
-			const permissionObject = permissions
-				.flat()
-				.find((each) => each.role === userRole);
-			if (permissionObject) {
-				const assignRoleToUser = await management.assignRolestoUser(
-					{
-						id: user.user_id
-					},
-					{ roles: [permissionObject.roleId] }
+			await findAndAssignRolesToUser(user.user_id, otherRoles);
+			return { user, context };
+		} else {
+			const newRoles = [];
+			for (let r of roles) {
+				const shibbolethRoles = otherRoles.find((otherRole) => r.toLowerCase() === otherRole.toLowerCase()
 				);
+				newRoles.push(shibbolethRoles);
+			}
+			if (newRoles.length > 0) {
+				await findAndAssignRolesToUser(user.user_id, newRoles);
 				return { user, context };
 			} else {
-				throw new Error(`Specified role: ${userRole} is not created in Auth0`);
+				return { user, context };
 			}
-		} else {
-			return { user, context };
 		}
 	};
-	auth0Rule(user, context)
-		.then((res) => {
-			return callback(null, res.user, res.context);
-		})
-		.catch((error) => callback(error));
+	rule(user, context).then(result => {
+		callback(null, user, context);
+	}).catch((error) => {
+		callback(error);
+	});
 }
-
-
-

@@ -1,21 +1,24 @@
 {
 	"tenant": "dev01-ucmerced",
-	"clientID": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
-	"clientName": "All Applications",
+	"clientID": "c5Y2hG0xbXMArqc3UvDuaYDnz46nYPdH",
+	"clientName": "React App 2021",
 	"clientMetadata": {},
 	"connection": "UCMShib",
 	"connectionStrategy": "samlp",
 	"connectionID": "con_4rp5Wjjt7aiO59Ys",
 	"connectionOptions": {
 		"tenant_domain": "ucmerced.edu",
-		"domain_aliases": ["ucmerced.edu", "localhost"]
+		"domain_aliases": [
+			"ucmerced.edu",
+			"localhost"
+		]
 	},
 	"connectionMetadata": {},
 	"samlConfiguration": {},
 	"jwtConfiguration": {},
 	"protocol": "oidc-basic-profile",
 	"stats": {
-		"loginsCount": 28
+		"loginsCount": 1
 	},
 	"sso": {
 		"with_auth0": false,
@@ -27,23 +30,27 @@
 		"methods": [
 			{
 				"name": "federated",
-				"timestamp": 1611808565098
+				"timestamp": 1611827393758
 			}
 		]
 	},
-	"sessionID": "7EDm1HD72iNOkacFRD03jwGPd04KJsQw",
+	"sessionID": "eHFoB9Y2x3VJeoIFTwqlUjdyFKP42AYI",
 	"request": {
-		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
-		"ip": "49.206.42.146",
+		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+		"ip": "2409:4070:2085:d6c5:353b:b436:3463:6fc1",
 		"hostname": "dev01-ucmerced.auth0.com",
 		"query": {
 			"protocol": "oauth2",
-			"client_id": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
+			"client_id": "c5Y2hG0xbXMArqc3UvDuaYDnz46nYPdH",
+			"redirect_uri": "http://localhost:3000",
+			"scope": "openid profile email",
 			"response_type": "code",
-			"connection": "UCMShib",
-			"prompt": "login",
-			"scope": "openid profile",
-			"redirect_uri": "https://manage.auth0.com/tester/callback?connection=UCMShib"
+			"response_mode": "query",
+			"state": "Wlp4N0VEcjZYUVBqdzhBSUp0NzRMX1FXQmJYc1ZSc2tjWDBBZGdkNGtvQg==",
+			"nonce": "ZWkzb0J4clk0R2V3QjBWLVRRV213RUd3TjNCYjJDREppbzIubFhVdGxoVQ==",
+			"code_challenge": "cbl0xL6APomGCsYDvPxThGzMVdhZgCLYyDNvz4sx77g",
+			"code_challenge_method": "S256",
+			"auth0Client": "eyJuYW1lIjoiYXV0aDAtcmVhY3QiLCJ2ZXJzaW9uIjoiMS4yLjAifQ=="
 		},
 		"body": {},
 		"geoip": {
@@ -58,6 +65,9 @@
 		}
 	},
 	"authorization": {
-		"roles": ["Student"]
+		"roles": [
+			"member",
+			"affiliate"
+		]
 	}
 }
