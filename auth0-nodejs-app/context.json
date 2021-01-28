@@ -1,0 +1,63 @@
+{
+	"tenant": "dev01-ucmerced",
+	"clientID": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
+	"clientName": "All Applications",
+	"clientMetadata": {},
+	"connection": "UCMShib",
+	"connectionStrategy": "samlp",
+	"connectionID": "con_4rp5Wjjt7aiO59Ys",
+	"connectionOptions": {
+		"tenant_domain": "ucmerced.edu",
+		"domain_aliases": ["ucmerced.edu", "localhost"]
+	},
+	"connectionMetadata": {},
+	"samlConfiguration": {},
+	"jwtConfiguration": {},
+	"protocol": "oidc-basic-profile",
+	"stats": {
+		"loginsCount": 28
+	},
+	"sso": {
+		"with_auth0": false,
+		"with_dbconn": false
+	},
+	"accessToken": {},
+	"idToken": {},
+	"authentication": {
+		"methods": [
+			{
+				"name": "federated",
+				"timestamp": 1611808565098
+			}
+		]
+	},
+	"sessionID": "7EDm1HD72iNOkacFRD03jwGPd04KJsQw",
+	"request": {
+		"userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.104 Safari/537.36",
+		"ip": "49.206.42.146",
+		"hostname": "dev01-ucmerced.auth0.com",
+		"query": {
+			"protocol": "oauth2",
+			"client_id": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
+			"response_type": "code",
+			"connection": "UCMShib",
+			"prompt": "login",
+			"scope": "openid profile",
+			"redirect_uri": "https://manage.auth0.com/tester/callback?connection=UCMShib"
+		},
+		"body": {},
+		"geoip": {
+			"country_code": "IN",
+			"country_code3": "IND",
+			"country_name": "India",
+			"city_name": "Hyderabad",
+			"latitude": 17.3753,
+			"longitude": 78.4744,
+			"time_zone": "Asia/Kolkata",
+			"continent_code": "AS"
+		}
+	},
+	"authorization": {
+		"roles": ["Student"]
+	}
+}

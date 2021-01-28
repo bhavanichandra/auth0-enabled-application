@@ -1,5 +1,5 @@
-id: permissions-validation
-name: permissions-validation
+id: jwt-permissions-validation-custom-policy
+name: Jwt Permissions Validation Custom Policy
 description: Policy to validate permissions fetched via JWT Policy. [JWT VALIDATION POLICY IS REQUIRED]
 category: Custom
 type: custom

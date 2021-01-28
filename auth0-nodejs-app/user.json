@@ -1,0 +1,36 @@
+{
+	"_id": "75875e0d47d0acc2b4f31008c5aab493",
+	"authenticationmethod": "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport",
+	"clientID": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
+	"created_at": "2021-01-19T17:21:36.650Z",
+	"identities": [
+		{
+			"user_id": "UCMShib|1826468503662377",
+			"provider": "samlp",
+			"connection": "UCMShib",
+			"isSocial": false
+		}
+	],
+	"issuer": "https://shib.ucmerced.edu/idp/shibboleth",
+	"name": "",
+	"nameIdAttributes": {
+		"value": "AAdzZWNyZXQxzfQU4LrG9hCtsUjIQqeQ/0v3Xx60X2fnVdd7ivArdjI0hqzAbS3F9HJ+ONmTPqmWhMK/zBTGBfsxaKy+CYlI9OJiGCC2nYrdMuBz6quRRG+CWe1KebdHnCsTWvP7WAjrn0u73bvKmVRwhls=",
+		"NameQualifier": "https://shib.ucmerced.edu/idp/shibboleth",
+		"SPNameQualifier": "urn:auth0:dev01-ucmerced:UCMShib",
+		"Format": "urn:oasis:names:tc:SAML:2.0:nameid-format:transient"
+	},
+	"nameidentifier": "AAdzZWNyZXQxzfQU4LrG9hCtsUjIQqeQ/0v3Xx60X2fnVdd7ivArdjI0hqzAbS3F9HJ+ONmTPqmWhMK/zBTGBfsxaKy+CYlI9OJiGCC2nYrdMuBz6quRRG+CWe1KebdHnCsTWvP7WAjrn0u73bvKmVRwhls=",
+	"nickname": "",
+	"picture": "https://cdn.auth0.com/avatars/default.png",
+	"sessionIndex": "_852a59b298bff11dc3fea98a214b6609",
+	"updated_at": "2021-01-28T04:36:05.092Z",
+	"user_id": "samlp|UCMShib|1826468503662377",
+	"user_metadata": {
+		"color": "blue"
+	},
+	"eduPersonAffiliation": ["member", "affiliate"],
+	"eduPersonPrimaryAffiliation": "affiliate",
+	"idmid": "1826468503662377",
+	"global_client_id": "mwMTYUU5dDaiwh97xSvaZrIkiq6G1cCv",
+	"persistent": {}
+}
